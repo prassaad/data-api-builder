@@ -24,6 +24,7 @@ using Azure.DataApiBuilder.Core.Services.OpenAPI;
 using Azure.DataApiBuilder.Service.Controllers;
 using Azure.DataApiBuilder.Service.Exceptions;
 using Azure.DataApiBuilder.Service.HealthCheck;
+using Azure.DataApiBuilder.Service.Middleware;
 using HotChocolate.AspNetCore;
 using HotChocolate.Execution.Configuration;
 using HotChocolate.Types;
@@ -323,6 +324,8 @@ namespace Azure.DataApiBuilder.Service
             app.UseCorrelationIdMiddleware();
             app.UsePathRewriteMiddleware();
 
+            // Add the middleware to the pipeline
+            app.UseRuntimeConfigMiddleware();
             // SwaggerUI visualization of the OpenAPI description document is only available
             // in developer mode in alignment with the restriction placed on ChilliCream's BananaCakePop IDE.
             // Consequently, SwaggerUI is not presented in a StaticWebApps (late-bound config) environment.
