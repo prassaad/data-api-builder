@@ -83,6 +83,11 @@ public class RuntimeConfigProvider
 
         return _runtimeConfig;
     }
+    public bool SetConfig(RuntimeConfig runtimeConfig)
+    {
+       _runtimeConfig = runtimeConfig;
+        return true;
+    }
 
     /// <summary>
     /// Checks if we have already attempted to configure the file watcher, if not

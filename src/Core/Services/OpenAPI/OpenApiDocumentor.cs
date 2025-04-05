@@ -27,7 +27,7 @@ namespace Azure.DataApiBuilder.Core.Services
     public class OpenApiDocumentor : IOpenApiDocumentor
     {
         private readonly IMetadataProviderFactory _metadataProviderFactory;
-        private readonly RuntimeConfig _runtimeConfig;
+        private RuntimeConfig _runtimeConfig;
         private OpenApiResponses _defaultOpenApiResponses;
         private OpenApiDocument? _openApiDocument;
 
@@ -153,6 +153,52 @@ namespace Azure.DataApiBuilder.Core.Services
                     innerException: ex);
             }
         }
+
+        public void CreateDocumentNewConfig(RuntimeConfig runtimeNewConfig)
+        {
+            _runtimeConfig = runtimeNewConfig; // Properly assign the new config
+            GenerateDocument(_runtimeConfig);
+        }
+
+        private void GenerateDocument(RuntimeConfig config)
+        {
+
+            try
+            {
+                string restEndpointPath = config.RestPath;
+                string? runtimeBaseRoute = config.Runtime?.BaseRoute;
+                string url = string.IsNullOrEmpty(runtimeBaseRoute) ? restEndpointPath : runtimeBaseRoute + "/" + restEndpointPath;
+                OpenApiComponents components = new()
+                {
+                    Schemas = CreateComponentSchemas()
+                };
+
+                OpenApiDocument doc = new()
+                {
+                    Info = new OpenApiInfo
+                    {
+                        Version = ProductInfo.GetProductVersion(),
+                        Title = DOCUMENTOR_UI_TITLE
+                    },
+                    Servers = new List<OpenApiServer>
+                    {
+                        new() { Url = url }
+                    },
+                    Paths = BuildPaths(),
+                    Components = components
+                };
+                _openApiDocument = doc;
+            }
+            catch (Exception ex)
+            {
+                throw new DataApiBuilderException(
+                    message: "OpenAPI description document generation failed.",
+                    statusCode: HttpStatusCode.InternalServerError,
+                    subStatusCode: DataApiBuilderException.SubStatusCodes.OpenApiDocumentCreationFailure,
+                    innerException: ex);
+            }
+        }
+
 
         /// <summary>
         /// Iterates through the runtime configuration's entities and generates the path object

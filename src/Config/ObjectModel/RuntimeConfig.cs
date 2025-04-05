@@ -210,7 +210,7 @@ public record RuntimeConfig
             foreach (string dataSourceFile in DataSourceFiles.SourceFiles)
             {
                 if (loader.TryLoadConfig(dataSourceFile, out RuntimeConfig? config, replaceEnvVar: true))
-                {
+                {   
                     try
                     {
                         _dataSourceNameToDataSource = _dataSourceNameToDataSource.Concat(config._dataSourceNameToDataSource).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
