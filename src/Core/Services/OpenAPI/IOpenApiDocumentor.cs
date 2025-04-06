@@ -3,6 +3,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Azure.DataApiBuilder.Config.ObjectModel;
+using Azure.DataApiBuilder.Core.Configurations;
 
 namespace Azure.DataApiBuilder.Core.Services
 {
@@ -29,7 +30,7 @@ namespace Azure.DataApiBuilder.Core.Services
         /// <seealso cref="https://github.com/microsoft/OpenAPI.NET/blob/1.6.3/src/Microsoft.OpenApi/OpenApiSpecVersion.cs"/>
         public void CreateDocument();
 
-        public void CreateDocumentNewConfig(RuntimeConfig _runtimeNewConfig);
+        public void CreateDocumentNewConfig(RuntimeConfigProvider _runtimeNewConfigProvider, RuntimeConfig _runtimeNewConfig);
 
     }
 }

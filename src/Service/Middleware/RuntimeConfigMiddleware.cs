@@ -84,10 +84,12 @@ namespace Azure.DataApiBuilder.Service.Middleware
                 {
                     // Running only in developer mode to ensure fast and smooth startup in production.
                     runtimeConfigValidator.ValidatePermissionsInConfig(runtimeConfig);
+                    //runtimeConfigValidator.ValidateEntitiesMetadata(runtimeConfig);
                 }
 
                 IMetadataProviderFactory sqlMetadataProviderFactory =
                     scopeServiceProvider.GetRequiredService<IMetadataProviderFactory>();
+
 
                 if (sqlMetadataProviderFactory is not null)
                 {
@@ -130,7 +132,7 @@ namespace Azure.DataApiBuilder.Service.Middleware
                     {
                         //var loaded = runtimeConfigProvider.SetConfig(runtimeConfig);
                         IOpenApiDocumentor openApiDocumentor = scopeServiceProvider.GetRequiredService<IOpenApiDocumentor>();
-                        openApiDocumentor.CreateDocumentNewConfig(runtimeConfig);
+                        openApiDocumentor.CreateDocumentNewConfig(runtimeConfigProvider, runtimeConfig);
                     }
                     catch (DataApiBuilderException)
                     {

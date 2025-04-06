@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 using Azure.DataApiBuilder.Config.DatabasePrimitives;
+using Azure.DataApiBuilder.Config.ObjectModel;
+using Azure.DataApiBuilder.Core.Configurations;
 
 namespace Azure.DataApiBuilder.Core.Services.MetadataProviders
 {
@@ -11,6 +13,14 @@ namespace Azure.DataApiBuilder.Core.Services.MetadataProviders
     /// </summary>
     public interface IMetadataProviderFactory
     {
+        // <summary>
+        /// Updates the RuntimeConfigProvider and reinitializes metadata providers based on the new configuration.
+        /// </summary>
+        /// <param name="runtimeConfigProvider">The new RuntimeConfigProvider to set</param>
+        /// <exception cref="ArgumentNullException">Thrown when runtimeConfigProvider is null</exception>
+        /// <exception cref="DataApiBuilderException">Thrown when initialization with new config fails</exception>
+        public void SetDynamicRuntimeConfigProvider(RuntimeConfigProvider runtimeConfigProvider, RuntimeConfig runtimeConfig);
+
         /// <summary>
         /// Gets the appropriate metadata provider based on the data source name.
         /// </summary>

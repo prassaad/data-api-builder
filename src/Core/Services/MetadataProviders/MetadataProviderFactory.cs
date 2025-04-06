@@ -16,28 +16,84 @@ namespace Azure.DataApiBuilder.Core.Services.MetadataProviders
     public class MetadataProviderFactory : IMetadataProviderFactory
     {
         private readonly IDictionary<string, ISqlMetadataProvider> _metadataProviders;
+        private readonly RuntimeConfigProvider _runtimeConfigProvider;
+        private readonly IAbstractQueryManagerFactory _queryManagerFactory;
+        private readonly ILogger<ISqlMetadataProvider> _logger;
+        private readonly IFileSystem _fileSystem;
+        private readonly bool _isValidateOnly;
 
         public MetadataProviderFactory(
-            RuntimeConfigProvider runtimeConfigProvider,
+           RuntimeConfigProvider runtimeConfigProvider,
             IAbstractQueryManagerFactory queryManagerFactory,
             ILogger<ISqlMetadataProvider> logger,
             IFileSystem fileSystem,
             bool isValidateOnly = false)
         {
+
+            _runtimeConfigProvider = runtimeConfigProvider;
+            _queryManagerFactory = queryManagerFactory;
+            _logger = logger;
+            _fileSystem = fileSystem;
+            _isValidateOnly = isValidateOnly;
+
             _metadataProviders = new Dictionary<string, ISqlMetadataProvider>();
             foreach ((string dataSourceName, DataSource dataSource) in runtimeConfigProvider.GetConfig().GetDataSourceNamesToDataSourcesIterator())
             {
                 ISqlMetadataProvider metadataProvider = dataSource.DatabaseType switch
                 {
-                    DatabaseType.CosmosDB_NoSQL => new CosmosSqlMetadataProvider(runtimeConfigProvider, fileSystem),
-                    DatabaseType.MSSQL => new MsSqlMetadataProvider(runtimeConfigProvider, queryManagerFactory, logger, dataSourceName, isValidateOnly),
-                    DatabaseType.DWSQL => new MsSqlMetadataProvider(runtimeConfigProvider, queryManagerFactory, logger, dataSourceName, isValidateOnly),
-                    DatabaseType.PostgreSQL => new PostgreSqlMetadataProvider(runtimeConfigProvider, queryManagerFactory, logger, dataSourceName, isValidateOnly),
-                    DatabaseType.MySQL => new MySqlMetadataProvider(runtimeConfigProvider, queryManagerFactory, logger, dataSourceName, isValidateOnly),
+                    DatabaseType.CosmosDB_NoSQL => new CosmosSqlMetadataProvider(_runtimeConfigProvider, fileSystem),
+                    DatabaseType.MSSQL => new MsSqlMetadataProvider(_runtimeConfigProvider, _queryManagerFactory, logger, dataSourceName, isValidateOnly),
+                    DatabaseType.DWSQL => new MsSqlMetadataProvider(_runtimeConfigProvider, _queryManagerFactory, logger, dataSourceName, isValidateOnly),
+                    DatabaseType.PostgreSQL => new PostgreSqlMetadataProvider(_runtimeConfigProvider, _queryManagerFactory, logger, dataSourceName, isValidateOnly),
+                    DatabaseType.MySQL => new MySqlMetadataProvider(_runtimeConfigProvider, _queryManagerFactory, logger, dataSourceName, isValidateOnly),
                     _ => throw new NotSupportedException(dataSource.DatabaseTypeNotSupportedMessage),
                 };
 
                 _metadataProviders.Add(dataSourceName, metadataProvider);
+            }
+        }
+
+        // <summary>
+        /// Updates the RuntimeConfigProvider and reinitializes metadata providers based on the new configuration.
+        /// </summary>
+        /// <param name="runtimeConfigProvider">The new RuntimeConfigProvider to set</param>
+        /// <exception cref="ArgumentNullException">Thrown when runtimeConfigProvider is null</exception>
+        /// <exception cref="DataApiBuilderException">Thrown when initialization with new config fails</exception>
+        public void SetDynamicRuntimeConfigProvider(RuntimeConfigProvider runtimeConfigProvider, RuntimeConfig runtimeConfig)
+        {
+            if (runtimeConfigProvider == null)
+            {
+                throw new ArgumentNullException(nameof(runtimeConfigProvider), "RuntimeConfigProvider cannot be null");
+            }
+
+            try
+            {
+                // Clear existing metadata providers
+                _metadataProviders.Clear();
+
+                // Rebuild metadata providers with new runtime config
+                foreach ((string dataSourceName, DataSource dataSource) in runtimeConfig.GetDataSourceNamesToDataSourcesIterator())
+                {
+                    ISqlMetadataProvider metadataProvider = dataSource.DatabaseType switch
+                    {
+                        DatabaseType.CosmosDB_NoSQL => new CosmosSqlMetadataProvider(runtimeConfigProvider, _fileSystem),
+                        DatabaseType.MSSQL => new MsSqlMetadataProvider(runtimeConfigProvider, _queryManagerFactory, _logger, dataSourceName, _isValidateOnly),
+                        DatabaseType.DWSQL => new MsSqlMetadataProvider(runtimeConfigProvider, _queryManagerFactory, _logger, dataSourceName, _isValidateOnly),
+                        DatabaseType.PostgreSQL => new PostgreSqlMetadataProvider(runtimeConfigProvider, _queryManagerFactory, _logger, dataSourceName, _isValidateOnly),
+                        DatabaseType.MySQL => new MySqlMetadataProvider(runtimeConfigProvider, _queryManagerFactory, _logger, dataSourceName, _isValidateOnly),
+                        _ => throw new NotSupportedException(dataSource.DatabaseTypeNotSupportedMessage),
+                    };
+
+                    _metadataProviders.Add(dataSourceName, metadataProvider);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new DataApiBuilderException(
+                    message: "Failed to set new RuntimeConfigProvider",
+                    statusCode: HttpStatusCode.InternalServerError,
+                    subStatusCode: DataApiBuilderException.SubStatusCodes.ConfigValidationError,
+                    innerException: ex);
             }
         }
 

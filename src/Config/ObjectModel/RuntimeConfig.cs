@@ -183,7 +183,7 @@ public record RuntimeConfig
         this.DataSource = DataSource;
         this.Runtime = Runtime;
         this.Entities = Entities;
-        this.DefaultDataSourceName = Guid.NewGuid().ToString();
+        this.DefaultDataSourceName = "api";
 
         // we will set them up with default values
         _dataSourceNameToDataSource = new Dictionary<string, DataSource>
