@@ -59,7 +59,7 @@ namespace Azure.DataApiBuilder.Core.Services.MetadataProviders
         /// <param name="runtimeConfigProvider">The new RuntimeConfigProvider to set</param>
         /// <exception cref="ArgumentNullException">Thrown when runtimeConfigProvider is null</exception>
         /// <exception cref="DataApiBuilderException">Thrown when initialization with new config fails</exception>
-        public void SetDynamicRuntimeConfigProvider(RuntimeConfigProvider runtimeConfigProvider, RuntimeConfig runtimeConfig)
+        public async Task SetDynamicRuntimeConfigProvider(RuntimeConfigProvider runtimeConfigProvider, RuntimeConfig runtimeConfig)
         {
             if (runtimeConfigProvider == null)
             {
@@ -86,6 +86,7 @@ namespace Azure.DataApiBuilder.Core.Services.MetadataProviders
 
                     _metadataProviders.Add(dataSourceName, metadataProvider);
                 }
+                await InitializeAsync();
             }
             catch (Exception ex)
             {

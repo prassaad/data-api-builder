@@ -19,7 +19,7 @@ namespace Azure.DataApiBuilder.Core.Services.MetadataProviders
         /// <param name="runtimeConfigProvider">The new RuntimeConfigProvider to set</param>
         /// <exception cref="ArgumentNullException">Thrown when runtimeConfigProvider is null</exception>
         /// <exception cref="DataApiBuilderException">Thrown when initialization with new config fails</exception>
-        public void SetDynamicRuntimeConfigProvider(RuntimeConfigProvider runtimeConfigProvider, RuntimeConfig runtimeConfig);
+        public Task SetDynamicRuntimeConfigProvider(RuntimeConfigProvider runtimeConfigProvider, RuntimeConfig runtimeConfig);
 
         /// <summary>
         /// Gets the appropriate metadata provider based on the data source name.

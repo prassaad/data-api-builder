@@ -35,9 +35,17 @@ namespace Azure.DataApiBuilder.Service.Middleware
                 null);
 
             // Create service instances
-            IFileSystem fileSystem = new FileSystem();
-            FileSystemRuntimeConfigLoader configLoader = new(fileSystem, configFileName, connectionString);
+            FileSystem fileSystem = new();
+            FileSystemRuntimeConfigLoader configLoader = new(fileSystem);
+            configLoader.UpdateConfigFilePath(configFileName);
+
             RuntimeConfigProvider configProvider = new(configLoader);
+
+            if (configProvider.TryGetConfig(out RuntimeConfig? runtimeConfig) && runtimeConfig.DataSource.DatabaseType is DatabaseType.PostgreSQL)
+            {
+                configProvider.IsLateConfigured = true;
+            }
+
 
             // Configure Application Insights conditionally
             //configProvider.TryGetConfig(out RuntimeConfig? runtimeConfig);

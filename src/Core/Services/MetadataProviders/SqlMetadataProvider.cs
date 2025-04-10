@@ -294,6 +294,11 @@ namespace Azure.DataApiBuilder.Core.Services
                 LogPrimaryKeys();
             }
 
+            System.Diagnostics.StackTrace stackTrace = new System.Diagnostics.StackTrace();
+            var baseMethodName = stackTrace.GetFrame(1)!.GetMethod()!.Name;
+            Console.WriteLine("In TryGetConfig" + baseMethodName);
+
+
             GenerateRestPathToEntityMap();
             InitODataParser();
             timer.Stop();

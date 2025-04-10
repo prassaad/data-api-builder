@@ -208,7 +208,7 @@ namespace Azure.DataApiBuilder.Core.Services
 
             // for rest scenario we need the default datasource name.
             string defaultDataSourceName = _runtimeConfig.DefaultDataSourceName;
-            _metadataProviderFactory.SetDynamicRuntimeConfigProvider(_runtimeConfigProvider, _runtimeConfig);
+            //_metadataProviderFactory.SetDynamicRuntimeConfigProvider(_runtimeConfigProvider, _runtimeConfig);
 
             ISqlMetadataProvider metadataProvider = _metadataProviderFactory.GetMetadataProvider(defaultDataSourceName);
 
