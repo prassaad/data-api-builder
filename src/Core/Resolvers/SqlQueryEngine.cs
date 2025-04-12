@@ -32,7 +32,7 @@ namespace Azure.DataApiBuilder.Core.Resolvers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IAuthorizationResolver _authorizationResolver;
         private readonly ILogger<IQueryEngine> _logger;
-        private readonly RuntimeConfigProvider _runtimeConfigProvider;
+        private RuntimeConfigProvider _runtimeConfigProvider;
         private readonly GQLFilterParser _gQLFilterParser;
         private readonly DabCacheService _cache;
 
@@ -57,6 +57,23 @@ namespace Azure.DataApiBuilder.Core.Resolvers
             _logger = logger;
             _runtimeConfigProvider = runtimeConfigProvider;
             _cache = cache;
+        }
+
+        public void SetDynamicRuntimeConfigProvider(RuntimeConfigProvider runtimeConfigProvider)
+        {
+            if (runtimeConfigProvider == null)
+            {
+                throw new ArgumentNullException(nameof(runtimeConfigProvider), "RuntimeConfigProvider cannot be null");
+            }
+
+            try
+            {
+                _runtimeConfigProvider = runtimeConfigProvider;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         /// <summary>

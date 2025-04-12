@@ -25,7 +25,7 @@ namespace Azure.DataApiBuilder.Core.Authorization;
 /// </summary>
 public class AuthorizationResolver : IAuthorizationResolver
 {
-    private readonly RuntimeConfigProvider _runtimeConfigProvider;
+    private RuntimeConfigProvider _runtimeConfigProvider;
     private readonly IMetadataProviderFactory _metadataProviderFactory;
     public const string WILDCARD = "*";
     public const string CLAIM_PREFIX = "@claims.";
@@ -35,7 +35,7 @@ public class AuthorizationResolver : IAuthorizationResolver
     public const string ROLE_ANONYMOUS = "anonymous";
     public const string ROLE_AUTHENTICATED = "authenticated";
 
-    public Dictionary<string, EntityMetadata> EntityPermissionsMap { get; private set; } = new();
+    public Dictionary<string, EntityMetadata> EntityPermissionsMap { get; set; } = new();
 
     public AuthorizationResolver(
         RuntimeConfigProvider runtimeConfigProvider,
@@ -59,6 +59,28 @@ public class AuthorizationResolver : IAuthorizationResolver
 
         _runtimeConfigProvider = runtimeConfigProvider;
     }
+
+    public void SetDynamicRuntimeConfigProvider(RuntimeConfigProvider runtimeConfigProvider)
+    {
+        if (runtimeConfigProvider == null)
+        {
+            throw new ArgumentNullException(nameof(runtimeConfigProvider), "RuntimeConfigProvider cannot be null");
+        }
+
+        try
+        {
+            _runtimeConfigProvider = runtimeConfigProvider;
+        }
+        catch (Exception ex)
+        {
+            throw new DataApiBuilderException(
+                message: "Failed to set new RuntimeConfigProvider",
+                statusCode: HttpStatusCode.InternalServerError,
+                subStatusCode: DataApiBuilderException.SubStatusCodes.ConfigValidationError,
+                innerException: ex);
+        }
+    }
+
 
     /// <summary>
     /// Whether client role header defined role is present in httpContext.Identity.Claims.Roles

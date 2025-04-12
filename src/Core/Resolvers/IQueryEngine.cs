@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Text.Json;
+using Azure.DataApiBuilder.Core.Configurations;
 using Azure.DataApiBuilder.Core.Models;
 using HotChocolate.Resolvers;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,7 @@ namespace Azure.DataApiBuilder.Core.Resolvers
     /// </summary>
     public interface IQueryEngine
     {
-        /// <summary>
+         /// <summary>
         /// Executes the given IMiddlewareContext of the GraphQL query and
         /// expecting a single Json back
         /// </summary>

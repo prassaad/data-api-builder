@@ -143,6 +143,9 @@ namespace Azure.DataApiBuilder.Service
             services.AddSingleton<GQLFilterParser>();
             services.AddSingleton<RequestValidator>();
             services.AddSingleton<RestService>();
+            services.AddSingleton<AuthorizationResolver>();
+            services.AddSingleton<SqlQueryEngine>();
+
             services.AddSingleton<HealthReportResponseWriter>();
 
             // ILogger explicit creation required for logger to use --LogLevel startup argument specified.

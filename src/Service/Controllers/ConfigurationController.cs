@@ -1,19 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
 using System.IO.Abstractions;
-using System.Threading.Tasks;
+using Azure.DataApiBuilder.Auth;
 using Azure.DataApiBuilder.Config;
 using Azure.DataApiBuilder.Config.ObjectModel;
+using Azure.DataApiBuilder.Core.Authorization;
 using Azure.DataApiBuilder.Core.Configurations;
 using Azure.DataApiBuilder.Core.Models;
+using Azure.DataApiBuilder.Core.Resolvers;
 using Azure.DataApiBuilder.Core.Services;
 using Azure.DataApiBuilder.Core.Services.MetadataProviders;
 using Azure.DataApiBuilder.Service.Exceptions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Azure.DataApiBuilder.Service.Controllers
 {
@@ -204,9 +203,22 @@ namespace Azure.DataApiBuilder.Service.Controllers
                     scopeServiceProvider.GetRequiredService<RestService>();
                 restService.SetDynamicRuntimeConfigProvider(runtimeConfigProvider);
 
+
                 RequestValidator restSValidationService =
                      scopeServiceProvider.GetRequiredService<RequestValidator>();
                 restSValidationService.SetDynamicRuntimeConfigProvider(runtimeConfigProvider);
+
+
+                AuthorizationResolver restAuthService = scopeServiceProvider.GetRequiredService<AuthorizationResolver>();
+                //restSAuthService.SetEntityPermissionMap(runtimeConfig);
+                restAuthService.SetDynamicRuntimeConfigProvider(runtimeConfigProvider);
+                restAuthService.SetEntityPermissionMap(runtimeConfig);
+
+                IAuthorizationResolver restAuthResService = scopeServiceProvider.GetRequiredService<IAuthorizationResolver>();
+                restAuthResService.EntityPermissionsMap = restAuthService.EntityPermissionsMap;
+
+                SqlQueryEngine sqlQryEngine = scopeServiceProvider.GetRequiredService<SqlQueryEngine>();
+                sqlQryEngine.SetDynamicRuntimeConfigProvider(runtimeConfigProvider);
 
 
                 if (graphQLSchemaCreator is null || restService is null)

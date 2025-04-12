@@ -105,6 +105,7 @@ public class RestAuthorizationHandler : IAuthorizationHandler
 
                 foreach (EntityActionOperation operation in operations)
                 {
+
                     bool isAuthorized = _authorizationResolver.AreRoleAndOperationDefinedForEntity(entityName, roleName, operation);
                     if (!isAuthorized)
                     {

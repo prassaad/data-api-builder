@@ -15,7 +15,7 @@ public interface IAuthorizationResolver
     /// <summary>
     /// Representation of authorization permissions for each entity in the runtime config.
     /// </summary>
-    public Dictionary<string, EntityMetadata> EntityPermissionsMap { get; }
+    public Dictionary<string, EntityMetadata> EntityPermissionsMap { get; set; }
 
     /// <summary>
     /// Checks for the existence of the client role header in httpContext.Request.Headers
