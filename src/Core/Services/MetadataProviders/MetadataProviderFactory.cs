@@ -16,7 +16,7 @@ namespace Azure.DataApiBuilder.Core.Services.MetadataProviders
     public class MetadataProviderFactory : IMetadataProviderFactory
     {
         private readonly IDictionary<string, ISqlMetadataProvider> _metadataProviders;
-        private readonly RuntimeConfigProvider _runtimeConfigProvider;
+        private RuntimeConfigProvider _runtimeConfigProvider;
         private readonly IAbstractQueryManagerFactory _queryManagerFactory;
         private readonly ILogger<ISqlMetadataProvider> _logger;
         private readonly IFileSystem _fileSystem;
@@ -70,6 +70,7 @@ namespace Azure.DataApiBuilder.Core.Services.MetadataProviders
             {
                 // Clear existing metadata providers
                 _metadataProviders.Clear();
+                _runtimeConfigProvider = runtimeConfigProvider;
 
                 // Rebuild metadata providers with new runtime config
                 foreach ((string dataSourceName, DataSource dataSource) in runtimeConfig.GetDataSourceNamesToDataSourcesIterator())

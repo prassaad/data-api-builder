@@ -24,13 +24,35 @@ namespace Azure.DataApiBuilder.Core.Services
         public const string PRIMARY_KEY_NOT_PROVIDED_ERR_MESSAGE = "Primary Key for this HTTP request type is required.";
 
         private readonly IMetadataProviderFactory _sqlMetadataProviderFactory;
-        private readonly RuntimeConfigProvider _runtimeConfigProvider;
+        private  RuntimeConfigProvider _runtimeConfigProvider;
 
         public RequestValidator(IMetadataProviderFactory sqlMetadataProviderFactory, RuntimeConfigProvider runtimeConfigProvider)
         {
             _sqlMetadataProviderFactory = sqlMetadataProviderFactory;
             _runtimeConfigProvider = runtimeConfigProvider;
         }
+
+        public void SetDynamicRuntimeConfigProvider(RuntimeConfigProvider runtimeConfigProvider)
+        {
+            if (runtimeConfigProvider == null)
+            {
+                throw new ArgumentNullException(nameof(runtimeConfigProvider), "RuntimeConfigProvider cannot be null");
+            }
+
+            try
+            {
+                _runtimeConfigProvider = runtimeConfigProvider;
+            }
+            catch (Exception ex)
+            {
+                throw new DataApiBuilderException(
+                    message: "Failed to set new RuntimeConfigProvider",
+                    statusCode: HttpStatusCode.InternalServerError,
+                    subStatusCode: DataApiBuilderException.SubStatusCodes.ConfigValidationError,
+                    innerException: ex);
+            }
+        }
+
 
         /// <summary>
         /// Validates the given request by ensuring:

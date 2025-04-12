@@ -31,7 +31,7 @@ namespace Azure.DataApiBuilder.Core.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IAuthorizationService _authorizationService;
         private readonly IMetadataProviderFactory _sqlMetadataProviderFactory;
-        private readonly RuntimeConfigProvider _runtimeConfigProvider;
+        private RuntimeConfigProvider _runtimeConfigProvider;
         private readonly RequestValidator _requestValidator;
 
         public RestService(
@@ -51,6 +51,27 @@ namespace Azure.DataApiBuilder.Core.Services
             _sqlMetadataProviderFactory = sqlMetadataProviderFactory;
             _runtimeConfigProvider = runtimeConfigProvider;
             _requestValidator = requestValidator;
+        }
+
+        public void SetDynamicRuntimeConfigProvider(RuntimeConfigProvider runtimeConfigProvider)
+        {
+            if (runtimeConfigProvider == null)
+            {
+                throw new ArgumentNullException(nameof(runtimeConfigProvider), "RuntimeConfigProvider cannot be null");
+            }
+
+            try
+            {
+               _runtimeConfigProvider = runtimeConfigProvider;
+            }
+            catch (Exception ex)
+            {
+                throw new DataApiBuilderException(
+                    message: "Failed to set new RuntimeConfigProvider",
+                    statusCode: HttpStatusCode.InternalServerError,
+                    subStatusCode: DataApiBuilderException.SubStatusCodes.ConfigValidationError,
+                    innerException: ex);
+            }
         }
 
         /// <summary>

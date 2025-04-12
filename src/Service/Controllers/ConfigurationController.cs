@@ -157,7 +157,6 @@ namespace Azure.DataApiBuilder.Service.Controllers
             var scopeServiceProvider = scope.ServiceProvider;
             var isRuntimeReady = PerformOnConfigChangeAsync(scopeServiceProvider, configProvider);
 
-
             return new JsonResult(runtimeConfig);
 
         }
@@ -203,6 +202,12 @@ namespace Azure.DataApiBuilder.Service.Controllers
 
                 RestService restService =
                     scopeServiceProvider.GetRequiredService<RestService>();
+                restService.SetDynamicRuntimeConfigProvider(runtimeConfigProvider);
+
+                RequestValidator restSValidationService =
+                     scopeServiceProvider.GetRequiredService<RequestValidator>();
+                restSValidationService.SetDynamicRuntimeConfigProvider(runtimeConfigProvider);
+
 
                 if (graphQLSchemaCreator is null || restService is null)
                 {
