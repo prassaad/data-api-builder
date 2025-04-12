@@ -44,6 +44,7 @@ namespace Azure.DataApiBuilder.Service.Middleware
             if (configProvider.TryGetConfig(out RuntimeConfig? runtimeConfig) && runtimeConfig.DataSource.DatabaseType is DatabaseType.PostgreSQL)
             {
                 configProvider.IsLateConfigured = true;
+
             }
 
 
@@ -58,7 +59,7 @@ namespace Azure.DataApiBuilder.Service.Middleware
             //// Add to request services if needed
             var scope = serviceProvider.CreateScope();
             var scopeServiceProvider = scope.ServiceProvider;
-            var isRuntimeReady = PerformOnConfigChangeAsync(scopeServiceProvider, configProvider);
+            //var isRuntimeReady = PerformOnConfigChangeAsync(scopeServiceProvider, configProvider);
 
             //DataSource dataSource = new(DatabaseType.PostgreSQL,
             //    connectionString!,
@@ -101,6 +102,7 @@ namespace Azure.DataApiBuilder.Service.Middleware
 
                 if (sqlMetadataProviderFactory is not null)
                 {
+                    await sqlMetadataProviderFactory.SetDynamicRuntimeConfigProvider(runtimeConfigProvider, runtimeConfig);
                     await sqlMetadataProviderFactory.InitializeAsync();
                 }
 
