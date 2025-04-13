@@ -1,10 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.Configuration;
+using System.IO.Abstractions;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Azure.DataApiBuilder.Auth;
+using Azure.DataApiBuilder.Config;
 using Azure.DataApiBuilder.Config.ObjectModel;
 using Azure.DataApiBuilder.Core.Configurations;
 using Azure.DataApiBuilder.Core.Models;
@@ -58,24 +61,6 @@ namespace Azure.DataApiBuilder.Core.Resolvers
             _runtimeConfigProvider = runtimeConfigProvider;
             _cache = cache;
         }
-
-        public void SetDynamicRuntimeConfigProvider(RuntimeConfigProvider runtimeConfigProvider)
-        {
-            if (runtimeConfigProvider == null)
-            {
-                throw new ArgumentNullException(nameof(runtimeConfigProvider), "RuntimeConfigProvider cannot be null");
-            }
-
-            try
-            {
-                _runtimeConfigProvider = runtimeConfigProvider;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
         /// <summary>
         /// Executes the given IMiddlewareContext of the GraphQL query and
         /// expecting a single Json and its related pagination metadata back.
@@ -194,14 +179,24 @@ namespace Azure.DataApiBuilder.Core.Resolvers
         // </summary>
         public async Task<JsonDocument?> ExecuteAsync(FindRequestContext context)
         {
-            string dataSourceName = _runtimeConfigProvider.GetConfig().GetDataSourceNameFromEntityName(context.EntityName);
+
+
+            string configFileName = "dab-config.json";
+            // Create service instances
+            FileSystem fileSystem = new();
+            FileSystemRuntimeConfigLoader configLoader = new(fileSystem);
+            configLoader.UpdateConfigFilePath(configFileName);
+
+            RuntimeConfigProvider configProvider = new(configLoader);
+
+            string dataSourceName = configProvider.GetConfig().GetDataSourceNameFromEntityName(context.EntityName);
 
             ISqlMetadataProvider sqlMetadataProvider = _sqlMetadataProviderFactory.GetMetadataProvider(dataSourceName);
             SqlQueryStructure structure = new(
                 context,
                 sqlMetadataProvider,
                 _authorizationResolver,
-                _runtimeConfigProvider,
+                configProvider,
                 _gQLFilterParser,
                 _httpContextAccessor.HttpContext!);
             return await ExecuteAsync(structure, dataSourceName);
@@ -311,7 +306,17 @@ namespace Azure.DataApiBuilder.Core.Resolvers
         // </summary>
         private async Task<JsonDocument?> ExecuteAsync(SqlQueryStructure structure, string dataSourceName, bool isMultipleCreateOperation = false)
         {
-            RuntimeConfig runtimeConfig = _runtimeConfigProvider.GetConfig();
+
+            string configFileName = "dab-config.json";
+            // Create service instances
+            FileSystem fileSystem = new();
+            FileSystemRuntimeConfigLoader configLoader = new(fileSystem);
+            configLoader.UpdateConfigFilePath(configFileName);
+
+            RuntimeConfigProvider configProvider = new(configLoader);
+
+
+            RuntimeConfig runtimeConfig = configProvider.GetConfig();
             DatabaseType databaseType = runtimeConfig.GetDataSourceFromDataSourceName(dataSourceName).DatabaseType;
             IQueryBuilder queryBuilder = _queryFactory.GetQueryBuilder(databaseType);
             IQueryExecutor queryExecutor = _queryFactory.GetQueryExecutor(databaseType);

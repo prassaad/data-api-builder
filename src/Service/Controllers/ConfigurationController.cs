@@ -217,8 +217,8 @@ namespace Azure.DataApiBuilder.Service.Controllers
                 IAuthorizationResolver restAuthResService = scopeServiceProvider.GetRequiredService<IAuthorizationResolver>();
                 restAuthResService.EntityPermissionsMap = restAuthService.EntityPermissionsMap;
 
-                SqlQueryEngine sqlQryEngine = scopeServiceProvider.GetRequiredService<SqlQueryEngine>();
-                sqlQryEngine.SetDynamicRuntimeConfigProvider(runtimeConfigProvider);
+                //SqlQueryEngine sqlQryEngine = scopeServiceProvider.GetRequiredService<SqlQueryEngine>();
+                //sqlQryEngine.SetDynamicRuntimeConfigProvider(runtimeConfigProvider);
 
 
                 if (graphQLSchemaCreator is null || restService is null)
