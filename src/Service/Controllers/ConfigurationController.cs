@@ -11,7 +11,10 @@ using Azure.DataApiBuilder.Core.Models;
 using Azure.DataApiBuilder.Core.Services;
 using Azure.DataApiBuilder.Core.Services.MetadataProviders;
 using Azure.DataApiBuilder.Service.Exceptions;
+using ConfigInterface;
+using ConfigInterface.Commands;
 using Microsoft.AspNetCore.Mvc;
+using CommandLine;
 
 namespace Azure.DataApiBuilder.Service.Controllers
 {
@@ -140,6 +143,26 @@ namespace Azure.DataApiBuilder.Service.Controllers
             //        .Replace(FileSystemRuntimeConfigLoader.ENVIRONMENT_PREFIX, ""),
             //    null);
 
+
+            AddOptions options = new(
+                source: "public.products",
+                permissions: new string[] { "anonymous", "*"},
+                entity: "products",
+                sourceType: "table",
+                sourceParameters: null,
+                sourceKeyFields: null,
+                restRoute: "/products",
+                graphQLType: null,
+                fieldsToInclude: new string[] { },
+                fieldsToExclude: new string[] { },
+                policyRequest: null,
+                policyDatabase: null,
+                config: configFileName,
+                restMethodsForStoredProcedure: null,
+                graphQLOperationForStoredProcedure: null
+            );
+
+
             // Create service instances
             FileSystem fileSystem = new();
             FileSystemRuntimeConfigLoader configLoader = new(fileSystem);
@@ -147,10 +170,18 @@ namespace Azure.DataApiBuilder.Service.Controllers
 
             RuntimeConfigProvider configProvider = new(configLoader);
 
+            configProvider.TryGetConfig(out RuntimeConfig? baseRuntimeConfig);
+            ConfigGenerator.TryAddNewEntity(options, baseRuntimeConfig!, out RuntimeConfig updatedRuntimeConfig);
+
+
+
             if (configProvider.TryGetConfig(out RuntimeConfig? runtimeConfig) && runtimeConfig.DataSource.DatabaseType is DatabaseType.PostgreSQL)
             {
                 configProvider.IsLateConfigured = true;
             }
+
+
+
 
             var scope = _serviceProvider.CreateScope();
             var scopeServiceProvider = scope.ServiceProvider;
@@ -263,6 +294,38 @@ namespace Azure.DataApiBuilder.Service.Controllers
             }
         }
 
+
+         /// <summary>
+        /// Execute the CLI command
+        /// </summary>
+        /// <param name="args">Command line arguments</param>
+        /// <param name="cliLogger">Logger used as sink for informational and error messages.</param>
+        /// <param name="fileSystem">Filesystem used for reading and writing configuration files, and exporting GraphQL schemas.</param>
+        /// <param name="loader">Loads the runtime config.</param>
+        /// <returns>Exit Code: 0 success, -1 failure</returns>
+        public static int Execute(string[] args, ILogger cliLogger, IFileSystem fileSystem, FileSystemRuntimeConfigLoader loader)
+        {
+            Parser parser = new(settings =>
+            {
+                settings.CaseInsensitiveEnumValues = true;
+                settings.HelpWriter = Console.Out;
+            });
+
+            // Parsing user arguments and executing required methods.
+            int result = parser.ParseArguments<InitOptions, AddOptions, UpdateOptions, StartOptions, ValidateOptions, ExportOptions, AddTelemetryOptions, ConfigureOptions>(args)
+                .MapResult(
+                    (InitOptions options) => options.Handler(cliLogger, loader, fileSystem),
+                    (AddOptions options) => options.Handler(cliLogger, loader, fileSystem),
+                    (UpdateOptions options) => options.Handler(cliLogger, loader, fileSystem),
+                    (StartOptions options) => options.Handler(cliLogger, loader, fileSystem),
+                    (ValidateOptions options) => options.Handler(cliLogger, loader, fileSystem),
+                    (AddTelemetryOptions options) => options.Handler(cliLogger, loader, fileSystem),
+                    (ConfigureOptions options) => options.Handler(cliLogger, loader, fileSystem),
+                    (ExportOptions options) => Exporter.Export(options, cliLogger, loader, fileSystem),
+                    errors => DabCliParserErrorHandler.ProcessErrorsAndReturnExitCode(errors));
+
+            return result;
+        }
 
     }
     /// <summary>

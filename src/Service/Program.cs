@@ -1,18 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
 using System.CommandLine;
 using System.CommandLine.Parsing;
-using System.Threading.Tasks;
 using Azure.DataApiBuilder.Config;
 using Azure.DataApiBuilder.Service.Exceptions;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.ApplicationInsights;
 
 namespace Azure.DataApiBuilder.Service
@@ -205,5 +199,6 @@ namespace Azure.DataApiBuilder.Service
                 .AddEnvironmentVariables(prefix: FileSystemRuntimeConfigLoader.ENVIRONMENT_PREFIX)
                 .AddCommandLine(args);
         }
+
     }
 }

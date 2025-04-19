@@ -1193,7 +1193,6 @@ namespace Cli
 
             RuntimeConfigProvider runtimeConfigProvider = new(loader);
 
-
             ILogger<RuntimeConfigValidator> runtimeConfigValidatorLogger = LoggerFactoryForCli.CreateLogger<RuntimeConfigValidator>();
             RuntimeConfigValidator runtimeConfigValidator = new(runtimeConfigProvider, fileSystem, runtimeConfigValidatorLogger, true);
 
