@@ -8,7 +8,6 @@ using Azure.DataApiBuilder.Config.ObjectModel;
 using Azure.DataApiBuilder.Core.Authorization;
 using Azure.DataApiBuilder.Core.Configurations;
 using Azure.DataApiBuilder.Core.Models;
-using Azure.DataApiBuilder.Core.Resolvers;
 using Azure.DataApiBuilder.Core.Services;
 using Azure.DataApiBuilder.Core.Services.MetadataProviders;
 using Azure.DataApiBuilder.Service.Exceptions;
@@ -136,10 +135,10 @@ namespace Azure.DataApiBuilder.Service.Controllers
             string configFileName = _configuration.GetValue<string>("ConfigFileName")
                ?? FileSystemRuntimeConfigLoader.DEFAULT_CONFIG_FILE_NAME;
 
-            string? connectionString = _configuration.GetValue<string?>(
-                FileSystemRuntimeConfigLoader.RUNTIME_ENV_CONNECTION_STRING
-                    .Replace(FileSystemRuntimeConfigLoader.ENVIRONMENT_PREFIX, ""),
-                null);
+            //string? connString = _configuration.GetValue<string?>(
+            //    FileSystemRuntimeConfigLoader.RUNTIME_ENV_CONNECTION_STRING
+            //        .Replace(FileSystemRuntimeConfigLoader.ENVIRONMENT_PREFIX, ""),
+            //    null);
 
             // Create service instances
             FileSystem fileSystem = new();
@@ -152,9 +151,10 @@ namespace Azure.DataApiBuilder.Service.Controllers
             {
                 configProvider.IsLateConfigured = true;
             }
+
             var scope = _serviceProvider.CreateScope();
             var scopeServiceProvider = scope.ServiceProvider;
-            var isRuntimeReady = PerformOnConfigChangeAsync(scopeServiceProvider, configProvider);
+            await PerformOnConfigChangeAsync(scopeServiceProvider, configProvider);
 
             return new JsonResult(runtimeConfig);
 

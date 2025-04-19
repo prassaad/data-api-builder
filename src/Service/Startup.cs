@@ -1,10 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
 using System.IO.Abstractions;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Azure.DataApiBuilder.Auth;
 using Azure.DataApiBuilder.Config;
 using Azure.DataApiBuilder.Config.Converters;
@@ -24,24 +21,15 @@ using Azure.DataApiBuilder.Core.Services.OpenAPI;
 using Azure.DataApiBuilder.Service.Controllers;
 using Azure.DataApiBuilder.Service.Exceptions;
 using Azure.DataApiBuilder.Service.HealthCheck;
-using Azure.DataApiBuilder.Service.Middleware;
 using HotChocolate.AspNetCore;
 using HotChocolate.Execution.Configuration;
-using HotChocolate.Types;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using ZiggyCreatures.Caching.Fusion;
 using CorsOptions = Azure.DataApiBuilder.Config.ObjectModel.CorsOptions;
 
@@ -328,7 +316,6 @@ namespace Azure.DataApiBuilder.Service
             app.UsePathRewriteMiddleware();
 
             // Add the middleware to the pipeline
-            app.UseRuntimeConfigMiddleware();
             // SwaggerUI visualization of the OpenAPI description document is only available
             // in developer mode in alignment with the restriction placed on ChilliCream's BananaCakePop IDE.
             // Consequently, SwaggerUI is not presented in a StaticWebApps (late-bound config) environment.

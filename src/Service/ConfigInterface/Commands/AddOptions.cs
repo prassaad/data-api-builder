@@ -4,11 +4,10 @@
 using System.IO.Abstractions;
 using Azure.DataApiBuilder.Config;
 using Azure.DataApiBuilder.Product;
-using Cli.Constants;
-using Microsoft.Extensions.Logging;
-using static Cli.Utils;
+using ConfigInterface.Constants;
+using static ConfigInterface.Utils;
 
-namespace Cli.Commands
+namespace ConfigInterface.Commands
 {
     /// <summary>
     /// Add command options
@@ -50,9 +49,7 @@ namespace Cli.Commands
         }
 
         public string Source { get; }
-
         public IEnumerable<string> Permissions { get; }
-
         public int Handler(ILogger logger, FileSystemRuntimeConfigLoader loader, IFileSystem fileSystem)
         {
             logger.LogInformation("{productName} {version}", PRODUCT_NAME, ProductInfo.GetProductVersion());
