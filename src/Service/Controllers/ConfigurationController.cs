@@ -13,6 +13,7 @@ using Azure.DataApiBuilder.Core.Services;
 using Azure.DataApiBuilder.Core.Services.MetadataProviders;
 using Azure.DataApiBuilder.Service.Exceptions;
 using Azure.DataApiBuilder.Service.Helpers;
+using Azure.DataApiBuilder.Service.Models;
 using Microsoft.AspNetCore.Mvc;
 using Path = System.IO.Path;
 
@@ -134,9 +135,9 @@ namespace Azure.DataApiBuilder.Service.Controllers
             return BadRequest();
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("addentity")]
-        public async Task<ActionResult> AddEntity()
+        public async Task<ActionResult> AddEntity([FromBody] AddEntityRequest request)
         {
             string configFileName = _configuration.GetValue<string>("ConfigFileName")
                ?? FileSystemRuntimeConfigLoader.DEFAULT_CONFIG_FILE_NAME;
@@ -147,7 +148,7 @@ namespace Azure.DataApiBuilder.Service.Controllers
             //    null);
 
 
-            var issuccees = await WriteNewEntity();
+            var issuccees = await WriteNewEntity(request);
 
             // Create service instances
             FileSystem fileSystem = new();
@@ -271,7 +272,7 @@ namespace Azure.DataApiBuilder.Service.Controllers
                 return false;
             }
         }
-        private async Task<bool> WriteNewEntity()
+        private async Task<bool> WriteNewEntity(AddEntityRequest request)
         {
             try
             {
@@ -287,11 +288,11 @@ namespace Azure.DataApiBuilder.Service.Controllers
 
                 // Add the new entity
                 EntityHelper.AddEntity(
-                config: config,
-                    entityName: "products",
-                    enableGraphQL: true,
-                    enableRest: true,
-                    allowAnonymous: true
+                    config: config,
+                    entityName: request.EntityName!,
+                    enableGraphQL: request.EnableGraphQL,
+                    enableRest: request.EnableRest,
+                    allowAnonymous: request.AllowAnonymous
                 );
 
                 // Save the updated configuration back to the file
@@ -303,7 +304,7 @@ namespace Azure.DataApiBuilder.Service.Controllers
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error adding entity: {ex.Message}");
+                throw new Exception($"Error adding entity '{request.EntityName}': {ex.Message}");
                 //Console.WriteLine($"An error occurred: {ex.Message}");
             }
         }
