@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.IO.Abstractions;
+using System.Text.Json.Nodes;
 using Azure.DataApiBuilder.Auth;
 using Azure.DataApiBuilder.Config;
 using Azure.DataApiBuilder.Config.ObjectModel;
@@ -11,10 +12,9 @@ using Azure.DataApiBuilder.Core.Models;
 using Azure.DataApiBuilder.Core.Services;
 using Azure.DataApiBuilder.Core.Services.MetadataProviders;
 using Azure.DataApiBuilder.Service.Exceptions;
-using ConfigInterface;
-using ConfigInterface.Commands;
+using Azure.DataApiBuilder.Service.Helpers;
 using Microsoft.AspNetCore.Mvc;
-using CommandLine;
+using Path = System.IO.Path;
 
 namespace Azure.DataApiBuilder.Service.Controllers
 {
@@ -26,17 +26,20 @@ namespace Azure.DataApiBuilder.Service.Controllers
         private readonly ILogger<ConfigurationController> _logger;
         private readonly IConfiguration _configuration;
         private readonly IServiceProvider _serviceProvider;
+        private readonly string _configFilePath;
         public ConfigurationController(
             RuntimeConfigProvider configurationProvider,
             ILogger<ConfigurationController> logger,
             IConfiguration configuration,
-            IServiceProvider serviceProvider
+            IServiceProvider serviceProvider,
+            IWebHostEnvironment environment
         )
         {
             _configurationProvider = configurationProvider;
             _logger = logger;
             _configuration = configuration;
             _serviceProvider = serviceProvider;
+            _configFilePath = Path.Combine(environment.ContentRootPath, "dab-config.json");
         }
 
         /// <summary>
@@ -144,24 +147,7 @@ namespace Azure.DataApiBuilder.Service.Controllers
             //    null);
 
 
-            AddOptions options = new(
-                source: "public.products",
-                permissions: new string[] { "anonymous", "*"},
-                entity: "products",
-                sourceType: "table",
-                sourceParameters: null,
-                sourceKeyFields: null,
-                restRoute: "/products",
-                graphQLType: null,
-                fieldsToInclude: new string[] { },
-                fieldsToExclude: new string[] { },
-                policyRequest: null,
-                policyDatabase: null,
-                config: configFileName,
-                restMethodsForStoredProcedure: null,
-                graphQLOperationForStoredProcedure: null
-            );
-
+            var issuccees = await WriteNewEntity();
 
             // Create service instances
             FileSystem fileSystem = new();
@@ -170,18 +156,10 @@ namespace Azure.DataApiBuilder.Service.Controllers
 
             RuntimeConfigProvider configProvider = new(configLoader);
 
-            configProvider.TryGetConfig(out RuntimeConfig? baseRuntimeConfig);
-            ConfigGenerator.TryAddNewEntity(options, baseRuntimeConfig!, out RuntimeConfig updatedRuntimeConfig);
-
-
-
             if (configProvider.TryGetConfig(out RuntimeConfig? runtimeConfig) && runtimeConfig.DataSource.DatabaseType is DatabaseType.PostgreSQL)
             {
                 configProvider.IsLateConfigured = true;
             }
-
-
-
 
             var scope = _serviceProvider.CreateScope();
             var scopeServiceProvider = scope.ServiceProvider;
@@ -293,38 +271,41 @@ namespace Azure.DataApiBuilder.Service.Controllers
                 return false;
             }
         }
-
-
-         /// <summary>
-        /// Execute the CLI command
-        /// </summary>
-        /// <param name="args">Command line arguments</param>
-        /// <param name="cliLogger">Logger used as sink for informational and error messages.</param>
-        /// <param name="fileSystem">Filesystem used for reading and writing configuration files, and exporting GraphQL schemas.</param>
-        /// <param name="loader">Loads the runtime config.</param>
-        /// <returns>Exit Code: 0 success, -1 failure</returns>
-        public static int Execute(string[] args, ILogger cliLogger, IFileSystem fileSystem, FileSystemRuntimeConfigLoader loader)
+        private async Task<bool> WriteNewEntity()
         {
-            Parser parser = new(settings =>
+            try
             {
-                settings.CaseInsensitiveEnumValues = true;
-                settings.HelpWriter = Console.Out;
-            });
+                // Check if file exists
+                if (!System.IO.File.Exists(_configFilePath))
+                {
+                    return false;
+                }
 
-            // Parsing user arguments and executing required methods.
-            int result = parser.ParseArguments<InitOptions, AddOptions, UpdateOptions, StartOptions, ValidateOptions, ExportOptions, AddTelemetryOptions, ConfigureOptions>(args)
-                .MapResult(
-                    (InitOptions options) => options.Handler(cliLogger, loader, fileSystem),
-                    (AddOptions options) => options.Handler(cliLogger, loader, fileSystem),
-                    (UpdateOptions options) => options.Handler(cliLogger, loader, fileSystem),
-                    (StartOptions options) => options.Handler(cliLogger, loader, fileSystem),
-                    (ValidateOptions options) => options.Handler(cliLogger, loader, fileSystem),
-                    (AddTelemetryOptions options) => options.Handler(cliLogger, loader, fileSystem),
-                    (ConfigureOptions options) => options.Handler(cliLogger, loader, fileSystem),
-                    (ExportOptions options) => Exporter.Export(options, cliLogger, loader, fileSystem),
-                    errors => DabCliParserErrorHandler.ProcessErrorsAndReturnExitCode(errors));
+                // Read the existing configuration
+                string jsonContent = System.IO.File.ReadAllText(_configFilePath);
+                JsonObject config = EntityHelper.LoadConfig(jsonContent);
 
-            return result;
+                // Add the new entity
+                EntityHelper.AddEntity(
+                config: config,
+                    entityName: "products",
+                    enableGraphQL: true,
+                    enableRest: true,
+                    allowAnonymous: true
+                );
+
+                // Save the updated configuration back to the file
+                string updatedJson = EntityHelper.SaveConfig(config);
+                System.IO.File.WriteAllText(_configFilePath, updatedJson);
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error adding entity: {ex.Message}");
+                //Console.WriteLine($"An error occurred: {ex.Message}");
+            }
         }
 
     }
