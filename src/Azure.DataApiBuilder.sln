@@ -2,10 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32405.409
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure.DataApiBuilder.Service", "Service\Azure.DataApiBuilder.Service.csproj", "{208FC26C-A21C-4C96-98EE-F10FDAEAC508}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure.DataApiBuilder.Service.Tests", "Service.Tests\Azure.DataApiBuilder.Service.Tests.csproj", "{4E50C9B0-818E-4041-B18B-5BB17E4D409F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configs", "Configs", "{EFA9C661-D8FD-469A-9372-284387C4BEFC}"
 	ProjectSection(SolutionItems) = preProject
 		..\schemas\dab.draft.schema.json = ..\schemas\dab.draft.schema.json
@@ -27,40 +23,51 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure.DataApiBuilder.Core",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure.DataApiBuilder.Product", "Product\Azure.DataApiBuilder.Product.csproj", "{E3D2076C-EE49-43A0-8F92-5FC41EC99DA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azure.DataApiBuilder.Service", "Service\Azure.DataApiBuilder.Service.csproj", "{3A4BD607-A343-4491-B061-5E0B99A2E2EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Docker|Any CPU = Docker|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{208FC26C-A21C-4C96-98EE-F10FDAEAC508}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{208FC26C-A21C-4C96-98EE-F10FDAEAC508}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{208FC26C-A21C-4C96-98EE-F10FDAEAC508}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{208FC26C-A21C-4C96-98EE-F10FDAEAC508}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4E50C9B0-818E-4041-B18B-5BB17E4D409F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E50C9B0-818E-4041-B18B-5BB17E4D409F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4E50C9B0-818E-4041-B18B-5BB17E4D409F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4E50C9B0-818E-4041-B18B-5BB17E4D409F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F55CC05C-EA9A-4B50-93A8-79294482FD7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F55CC05C-EA9A-4B50-93A8-79294482FD7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F55CC05C-EA9A-4B50-93A8-79294482FD7F}.Docker|Any CPU.ActiveCfg = Debug|Any CPU
+		{F55CC05C-EA9A-4B50-93A8-79294482FD7F}.Docker|Any CPU.Build.0 = Debug|Any CPU
 		{F55CC05C-EA9A-4B50-93A8-79294482FD7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F55CC05C-EA9A-4B50-93A8-79294482FD7F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E0B51C8F-493D-4C69-8B27-C114D3874176}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E0B51C8F-493D-4C69-8B27-C114D3874176}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0B51C8F-493D-4C69-8B27-C114D3874176}.Docker|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0B51C8F-493D-4C69-8B27-C114D3874176}.Docker|Any CPU.Build.0 = Debug|Any CPU
 		{E0B51C8F-493D-4C69-8B27-C114D3874176}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0B51C8F-493D-4C69-8B27-C114D3874176}.Release|Any CPU.Build.0 = Release|Any CPU
 		{249FF898-AD6E-46F2-B441-F6926BCD5179}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{249FF898-AD6E-46F2-B441-F6926BCD5179}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{249FF898-AD6E-46F2-B441-F6926BCD5179}.Docker|Any CPU.ActiveCfg = Debug|Any CPU
+		{249FF898-AD6E-46F2-B441-F6926BCD5179}.Docker|Any CPU.Build.0 = Debug|Any CPU
 		{249FF898-AD6E-46F2-B441-F6926BCD5179}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{249FF898-AD6E-46F2-B441-F6926BCD5179}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9668083A-8A54-40E8-9C19-789B317D3F41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9668083A-8A54-40E8-9C19-789B317D3F41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9668083A-8A54-40E8-9C19-789B317D3F41}.Docker|Any CPU.ActiveCfg = Debug|Any CPU
+		{9668083A-8A54-40E8-9C19-789B317D3F41}.Docker|Any CPU.Build.0 = Debug|Any CPU
 		{9668083A-8A54-40E8-9C19-789B317D3F41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9668083A-8A54-40E8-9C19-789B317D3F41}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E3D2076C-EE49-43A0-8F92-5FC41EC99DA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E3D2076C-EE49-43A0-8F92-5FC41EC99DA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3D2076C-EE49-43A0-8F92-5FC41EC99DA7}.Docker|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3D2076C-EE49-43A0-8F92-5FC41EC99DA7}.Docker|Any CPU.Build.0 = Debug|Any CPU
 		{E3D2076C-EE49-43A0-8F92-5FC41EC99DA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3D2076C-EE49-43A0-8F92-5FC41EC99DA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A4BD607-A343-4491-B061-5E0B99A2E2EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A4BD607-A343-4491-B061-5E0B99A2E2EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A4BD607-A343-4491-B061-5E0B99A2E2EA}.Docker|Any CPU.ActiveCfg = Docker|Any CPU
+		{3A4BD607-A343-4491-B061-5E0B99A2E2EA}.Docker|Any CPU.Build.0 = Docker|Any CPU
+		{3A4BD607-A343-4491-B061-5E0B99A2E2EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A4BD607-A343-4491-B061-5E0B99A2E2EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

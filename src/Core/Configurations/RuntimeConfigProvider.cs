@@ -134,6 +134,7 @@ public class RuntimeConfigProvider
                 TrySetupConfigFileWatcher();
             }
         }
+
         runtimeConfig = _runtimeConfig;
         return _runtimeConfig is not null;
     }

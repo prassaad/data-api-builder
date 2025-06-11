@@ -148,7 +148,7 @@ namespace Azure.DataApiBuilder.Service.Controllers
             //    null);
 
 
-            var issuccees = await WriteNewEntity(request);
+            await WriteNewEntity(request);
 
             // Create service instances
             FileSystem fileSystem = new();
