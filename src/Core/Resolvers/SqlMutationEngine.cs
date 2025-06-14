@@ -3,11 +3,13 @@
 
 using System.Data;
 using System.Data.Common;
+using System.IO.Abstractions;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Transactions;
 using Azure.DataApiBuilder.Auth;
+using Azure.DataApiBuilder.Config;
 using Azure.DataApiBuilder.Config.DatabasePrimitives;
 using Azure.DataApiBuilder.Config.ObjectModel;
 using Azure.DataApiBuilder.Core.Authorization;
@@ -42,7 +44,7 @@ namespace Azure.DataApiBuilder.Core.Resolvers
         private readonly IAuthorizationResolver _authorizationResolver;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly GQLFilterParser _gQLFilterParser;
-        private readonly RuntimeConfigProvider _runtimeConfigProvider;
+        private RuntimeConfigProvider _runtimeConfigProvider;
         public const string IS_UPDATE_RESULT_SET = "IsUpdateResultSet";
         private const string TRANSACTION_EXCEPTION_ERROR_MSG = "An unexpected error occurred during the transaction execution";
         public const string SINGLE_INPUT_ARGUEMENT_NAME = "item";
@@ -465,6 +467,16 @@ namespace Azure.DataApiBuilder.Core.Resolvers
         /// <returns>IActionResult</returns>
         public async Task<IActionResult?> ExecuteAsync(RestRequestContext context)
         {
+
+
+            string configFileName = "dab-config.json";
+            // Create service instances
+            FileSystem fileSystem = new();
+            FileSystemRuntimeConfigLoader configLoader = new(fileSystem);
+            configLoader.UpdateConfigFilePath(configFileName);
+
+            RuntimeConfigProvider configProvider = new(configLoader);
+            _runtimeConfigProvider = configProvider;
             // for REST API scenarios, use the default datasource
             string dataSourceName = _runtimeConfigProvider.GetConfig().DefaultDataSourceName;
 

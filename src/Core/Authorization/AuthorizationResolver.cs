@@ -2,11 +2,13 @@
 // Licensed under the MIT License.
 
 using System.IdentityModel.Tokens.Jwt;
+using System.IO.Abstractions;
 using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Azure.DataApiBuilder.Auth;
+using Azure.DataApiBuilder.Config;
 using Azure.DataApiBuilder.Config.DatabasePrimitives;
 using Azure.DataApiBuilder.Config.ObjectModel;
 using Azure.DataApiBuilder.Core.Configurations;
@@ -16,6 +18,7 @@ using Azure.DataApiBuilder.Service.Exceptions;
 using HotChocolate.Resolvers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Polly;
 
 namespace Azure.DataApiBuilder.Core.Authorization;
 
@@ -154,7 +157,19 @@ public class AuthorizationResolver : IAuthorizationResolver
     /// <inheritdoc />
     public bool AreColumnsAllowedForOperation(string entityName, string roleName, EntityActionOperation operation, IEnumerable<string> columns)
     {
+
+        string configFileName = "dab-config.json";
+          // Create service instances
+        FileSystem fileSystem = new();
+        FileSystemRuntimeConfigLoader configLoader = new(fileSystem);
+        configLoader.UpdateConfigFilePath(configFileName);
+
+        RuntimeConfigProvider configProviderLocal = new(configLoader);
+        SetDynamicRuntimeConfigProvider(configProviderLocal);
+
         string dataSourceName = _runtimeConfigProvider.GetConfig().GetDataSourceNameFromEntityName(entityName);
+
+
         ISqlMetadataProvider metadataProvider = _metadataProviderFactory.GetMetadataProvider(dataSourceName);
 
         if (!EntityPermissionsMap[entityName].RoleToOperationMap.TryGetValue(roleName, out RoleMetadata? roleMetadata) && roleMetadata is null)
