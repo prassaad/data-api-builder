@@ -8,7 +8,9 @@ namespace Azure.DataApiBuilder.Service.Models
     public class AddEntityRequest
     {
         [Required(ErrorMessage = "EntityName is required")]
-        public  string? EntityName { get; set; }
+        public string? SubDomain { get; set; }
+        public string? TenantWorkSpaceId { get; set; }
+        public string? EntityName { get; set; }
         public bool EnableGraphQL { get; set; } = true;
         public bool EnableRest { get; set; } = true;
         public bool AllowAnonymous { get; set; } = true;

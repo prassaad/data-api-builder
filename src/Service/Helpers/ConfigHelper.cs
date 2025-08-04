@@ -5,7 +5,7 @@ namespace Azure.DataApiBuilder.Service.Helpers
 {
     public class EntityHelper
     {
-        public static void AddEntity(JsonObject config, string entityName, bool enableGraphQL = true, bool enableRest = true, bool allowAnonymous = true)
+        public static void AddEntity(JsonObject config,string subDomain, string tenantWorkSpaceId,string entityName, bool enableGraphQL = true, bool enableRest = true, bool allowAnonymous = true)
         {
             if (config == null || string.IsNullOrEmpty(entityName))
             {
@@ -25,7 +25,7 @@ namespace Azure.DataApiBuilder.Service.Helpers
             {
                 ["source"] = new JsonObject
                 {
-                    ["object"] = entityName,
+                    ["object"] = tenantWorkSpaceId+"."+ entityName,
                     ["type"] = "table"
                 },
                 ["graphql"] = new JsonObject
@@ -33,13 +33,14 @@ namespace Azure.DataApiBuilder.Service.Helpers
                     ["enabled"] = enableGraphQL,
                     ["type"] = new JsonObject
                     {
-                        ["singular"] = entityName,
-                        ["plural"] = entityName
+                        ["singular"] = subDomain + "_" + entityName,
+                        ["plural"] = subDomain + "_" + entityName + "s"
                     }
                 },
                 ["rest"] = new JsonObject
                 {
-                    ["enabled"] = enableRest
+                    ["enabled"] = enableRest,
+                    ["path"] =  "/"+ subDomain + "-" + entityName
                 }
             };
 
@@ -63,7 +64,7 @@ namespace Azure.DataApiBuilder.Service.Helpers
             }
 
             // Add entity to entities collection
-            entities![entityName] = entityConfig;
+            entities![subDomain + "_" + entityName] = entityConfig;
         }
 
         // Helper method to load JSON config from string

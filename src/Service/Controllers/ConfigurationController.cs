@@ -289,6 +289,8 @@ namespace Azure.DataApiBuilder.Service.Controllers
                 // Add the new entity
                 EntityHelper.AddEntity(
                     config: config,
+                    subDomain: request.SubDomain!,
+                    tenantWorkSpaceId: request.TenantWorkSpaceId!,
                     entityName: request.EntityName!,
                     enableGraphQL: request.EnableGraphQL,
                     enableRest: request.EnableRest,
